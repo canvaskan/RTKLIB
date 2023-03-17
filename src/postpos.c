@@ -1158,7 +1158,7 @@ extern int postpos(gtime_t ts, gtime_t te, double ti, double tu,
 {
     gtime_t tts,tte,ttte;
     double tunit,tss;
-    int i,j,k,nf,stat=0,week,flag=1,index[MAXINFILE]={0};
+    int i,j,k,nf,stat=0,week,flag=1,index[MAXINFILE]={0}; // index shows groups of files
     char *ifile[MAXINFILE],ofile[1024],*ext;
     
     trace(3,"postpos : ti=%.0f tu=%.0f n=%d outfile=%s\n",ti,tu,n,outfile);
@@ -1179,14 +1179,14 @@ extern int postpos(gtime_t ts, gtime_t te, double ti, double tu,
                 return -1;
             }
         }
-        if (tu==0.0||tu>86400.0*MAXPRCDAYS) tu=86400.0*MAXPRCDAYS;
+        if (tu==0.0||tu>86400.0*MAXPRCDAYS) tu=86400.0*MAXPRCDAYS; // default tu = 8640000 s = 100 d period length
         settspan(ts,te);
-        tunit=tu<86400.0?tu:86400.0;
-        tss=tunit*(int)floor(time2gpst(ts,&week)/tunit);
+        tunit=tu<86400.0?tu:86400.0;                               // tunit = 86400 s
+        tss=tunit*(int)floor(time2gpst(ts,&week)/tunit);           // tss = ts.gpstsec
         
-        for (i=0;;i++) { /* for each periods */
-            tts=gpst2time(week,tss+i*tu);
-            tte=timeadd(tts,tu-DTTOL);
+        for (i=0;;i++) { /* for each periods */                    // period = 100 d by default
+            tts=gpst2time(week,tss+i*tu);                          // tts = ts + i*tu(100 d) period start time
+            tte=timeadd(tts,tu-DTTOL);                             // tte = tts + tu - DTTOL period end time
             if (timediff(tts,te)>0.0) break;
             if (timediff(tts,ts)<0.0) tts=ts;
             if (timediff(tte,te)>0.0) tte=te;
@@ -1197,6 +1197,7 @@ extern int postpos(gtime_t ts, gtime_t te, double ti, double tu,
                 stat=1;
                 break;
             }
+            // for each input file
             for (j=k=nf=0;j<n;j++) {
                 
                 ext=strrchr(infile[j],'.');

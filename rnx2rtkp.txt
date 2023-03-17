@@ -1,0 +1,9 @@
+1. 用VS打开msc目录下的sln
+2. 自动更新，Release编译通过，切换到Debug模式
+3. 修改C/C++ -> 常规 -> 附加包含目录，与release一致
+4. 修改链接器 -> 输入 -> 附加依赖项，添加winmm.lib;
+5. 修改常规 -> 目标文件名，rnx2rtkp
+
+bugs:
+1. options pos1-frequency     =l1+l2       # (1:l1,2:l1+l2,3:l1+l2+l5,4:l1+l2+l5+l6,5:l1+l2+l5+l6+l7)
+2. 不设置-o时，options pos1-frequency     =l1+l2会在expath中报错，原因不明

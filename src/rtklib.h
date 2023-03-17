@@ -980,7 +980,7 @@ typedef struct {        /* processing options type */
     int minfix;         /* min fix count to hold ambiguity */
     int ionoopt;        /* ionosphere option (IONOOPT_???) */
     int tropopt;        /* troposphere option (TROPOPT_???) */
-    int dynamics;       /* dynamics model (0:none,1:velociy,2:accel) */
+    int dynamics;       /* dynamics model (0:none,1:velocity,2:accel) */
     int tidecorr;       /* earth tide correction (0:off,1:solid,2:solid+otl+pole) */
     int niter;          /* number of filter iteration */
     int codesmooth;     /* code smoothing window size (0:none) */
@@ -1014,7 +1014,7 @@ typedef struct {        /* processing options type */
     pcv_t pcvr[2];      /* receiver antenna parameters {rov,base} */
     unsigned char exsats[MAXSAT]; /* excluded satellites (1:excluded,2:included) */
     char rnxopt[2][256]; /* rinex options {rover,base} */
-    int  posopt[6];     /* positioning options */
+    int  posopt[6];     /* positioning options , [0] sat ant, [1] rec ant, [2] windupcorr,*/
     int  syncsol;       /* solution sync mode (0:off,1:on) */
     double odisp[2][6*11]; /* ocean tide loading parameters {rov,base} */
     exterr_t exterr;    /* extended receiver error model */

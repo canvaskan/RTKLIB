@@ -79,7 +79,7 @@ static int readsp3h(FILE *fp, gtime_t *time, char *type, int *sats,
         }
         else if (2<=i&&i<=6) {
             if (i==2) {
-                ns=(int)str2num(buff,4,2);
+                ns = (int)str2num(buff, 3, 3);//Fixed Bug:No152
             }
             for (j=0;j<17&&k<ns;j++) {
                 sys=code2sys(buff[9+3*j]);
@@ -167,7 +167,7 @@ static void readsp3b(FILE *fp, char type, int *sats, int ns, double *bfact,
             }
             for (j=0;j<4;j++) {
                 
-                /* read option for predicted value */
+                /* read option for predicted value */ //K: default opt = 0, skip these if
                 if (j< 3&&(opt&1)&& pred_o) continue;
                 if (j< 3&&(opt&2)&&!pred_o) continue;
                 if (j==3&&(opt&1)&& pred_c) continue;
@@ -207,7 +207,12 @@ static int cmppeph(const void *p1, const void *p2)
     double tt=timediff(q1->time,q2->time);
     return tt<-1E-9?-1:(tt>1E-9?1:q1->index-q2->index);
 }
-/* combine precise ephemeris -------------------------------------------------*/
+/* combine precise ephemeris -------------------------------------------------
+K: normaly i == j-1
+   if time of (peph[i], peph[j]) is close
+      copy peph[j] to peph[i], then i=i, j=j+1,
+      so, in next loop, i == j-2,
+      the else-if block is usually useless*/
 static void combpeph(nav_t *nav, int opt)
 {
     int i,j,k,m;
@@ -230,7 +235,10 @@ static void combpeph(nav_t *nav, int opt)
                 for (m=0;m<4;m++) nav->peph[i].vst[k][m]=nav->peph[j].vst[k][m];
             }
         }
-        else if (++i<j) nav->peph[i]=nav->peph[j];
+        else if (++i < j)
+        {
+            nav->peph[i] = nav->peph[j]; 
+        }
     }
     nav->ne=i+1;
     

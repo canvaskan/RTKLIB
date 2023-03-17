@@ -49,7 +49,7 @@ static char snrmask_[NFREQ][1024];
 #define GEOOPT  "0:internal,1:egm96,2:egm08_2.5,3:egm08_1,4:gsi2000"
 #define STAOPT  "0:all,1:single"
 #define STSOPT  "0:off,1:state,2:residual"
-#define ARMOPT  "0:off,1:continuous,2:instantaneous,3:fix-and-hold"
+#define ARMOPT  "0:off,1:continuous,2:instantaneous,3:fix-and-hold,4:ARMODE_PPPAR"
 #define POSOPT  "0:llh,1:xyz,2:single,3:posfile,4:rinexhead,5:rtcm"
 #define TIDEOPT "0:off,1:on,2:otl"
 
@@ -163,25 +163,35 @@ opt_t sysopts[]={
     
     {"",0,NULL,""} /* terminator */
 };
-/* discard space characters at tail ------------------------------------------*/
+/* discard space characters at tail ------------------------------------------
+   K: content after symbol '#' is comment*/
 static void chop(char *str)
 {
     char *p;
     if ((p=strchr(str,'#'))) *p='\0'; /* comment */
     for (p=str+strlen(str)-1;p>=str&&!isgraph((int)*p);p--) *p='\0';
 }
-/* enum to string ------------------------------------------------------------*/
+/* enum to string ------------------------------------------------------------
+   K: look up val in comment{"val:str,val:str,..."} 
+   if "val:" not in comment:
+       return n; s="val";
+   if "val:" in comment:
+       if ',' or ')' not in str:
+       s=str...till end; return str...till end;
+   s = str
+   return len(str) 
+   */
 static int enum2str(char *s, const char *comment, int val)
 {
     char str[32],*p,*q;
     int n;
     
-    n=sprintf(str,"%d:",val);
-    if (!(p=strstr(comment,str))) {
+    n=sprintf(str,"%d:",val);                         // n = len(str) ; str = "val:"
+    if (!(p=strstr(comment,str))) {                   // p -> "val:str,^val:str,..."
         return sprintf(s,"%d",val);
     }
-    if (!(q=strchr(p+n,','))&&!(q=strchr(p+n,')'))) {
-        strcpy(s,p+n);
+    if (!(q=strchr(p+n,','))&&!(q=strchr(p+n,')'))) { // q -> "val:str,val:str^,..."
+        strcpy(s,p+n);                                // s -> "
         return strlen(p+n);
     }
     strncpy(s,p+n,q-p-n); s[q-p-n]='\0';
